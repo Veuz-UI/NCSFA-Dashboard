@@ -6,6 +6,7 @@
     <title>Subscriptions Management - Club Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/fonts/main_font/stylesheet.css">
+        <link rel="stylesheet" href="assets/fonts/webfont/stylesheet.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         :root {
@@ -171,7 +172,7 @@
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             font-size: 12px;
             white-space: nowrap;
             overflow: hidden;
@@ -455,7 +456,7 @@
 
         .subscription-price {
             display: flex;
-            align-items: baseline;
+            align-items: self-end;
             justify-content: center;
             gap: 6px;
             margin-bottom: 6px;
@@ -1688,14 +1689,14 @@
                 <div class="subscription-card" data-features='["Access to gym facilities","Group fitness classes","Locker room access","Free WiFi"]'>
                     <div class="subscription-header">
                         <div class="subscription-icon">
-                            <i class="fas fa-running"></i>
+                             <i class="fas fa-user-friends fa-xs" aria-hidden="true"></i>
                         </div>
                         <div class="subscription-header-info">
-                            <h3 class="subscription-name">Basic</h3>
+                            <h3 class="subscription-name">Family Mini Plan </h3>
                             <p class="subscription-tagline">Perfect for getting started</p>
                             <div class="subscription-price">
                                 <span class="price-amount">199</span>
-                                <span class="price-currency">SAR</span>
+                                <span class="price-currency"><span class="sar-symbol">&#xEA;</span></span>
                                 <span class="price-period">/ month</span>
                             </div>
                             <span class="subscription-status status-active">Active</span>
@@ -1737,14 +1738,14 @@
                     <div class="subscription-header">
                         <span class="subscription-featured-badge">Most Popular</span>
                         <div class="subscription-icon">
-                            <i class="fas fa-crown"></i>
+                              <i class="fas fa-plus small-plus"></i>
                         </div>
                         <div class="subscription-header-info">
-                            <h3 class="subscription-name">Premium</h3>
+                            <h3 class="subscription-name">Family Plus Plan</h3>
                             <p class="subscription-tagline">Best value for serious fitness</p>
                             <div class="subscription-price">
                                 <span class="price-amount">499</span>
-                                <span class="price-currency">SAR</span>
+                                <span class="price-currency"><span class="sar-symbol">&#xEA;</span></span>
                                 <span class="price-period">/ month</span>
                             </div>
                             <span class="subscription-discount">Save 30%</span>
@@ -1786,14 +1787,14 @@
                 <div class="subscription-card" data-features='["All Premium features","Unlimited personal training","VIP locker & amenities","Guest passes (4/month)","Recovery & massage therapy","24/7 facility access"]'>
                     <div class="subscription-header">
                         <div class="subscription-icon">
-                            <i class="fas fa-gem"></i>
+                             <i class="fas fa-star small-star"></i>
                         </div>
                         <div class="subscription-header-info">
-                            <h3 class="subscription-name">Elite</h3>
+                            <h3 class="subscription-name">Family Premium Plan</h3>
                             <p class="subscription-tagline">Ultimate fitness experience</p>
                             <div class="subscription-price">
                                 <span class="price-amount">899</span>
-                                <span class="price-currency">SAR</span>
+                                <span class="price-currency"><span class="sar-symbol">&#xEA;</span></span>
                                 <span class="price-period">/ month</span>
                             </div>
                             <span class="subscription-status status-active">Active</span>
@@ -1834,14 +1835,14 @@
                 <div class="subscription-card" data-features='["Access to gym facilities","Group fitness classes","Locker room access","Valid student ID required"]'>
                     <div class="subscription-header">
                         <div class="subscription-icon">
-                            <i class="fas fa-graduation-cap"></i>
+                              <i class="fas fa-child"></i>
                         </div>
                         <div class="subscription-header-info">
-                            <h3 class="subscription-name">Student</h3>
+                            <h3 class="subscription-name">Kids Basic Plan</h3>
                             <p class="subscription-tagline">Special pricing for students</p>
                             <div class="subscription-price">
                                 <span class="price-amount">149</span>
-                                <span class="price-currency">SAR</span>
+                                <span class="price-currency"><span class="sar-symbol">&#xEA;</span></span>
                                 <span class="price-period">/ month</span>
                             </div>
                             <span class="subscription-discount">25% Off</span>
@@ -1890,7 +1891,7 @@
                             <p class="subscription-tagline">Perfect for the whole family</p>
                             <div class="subscription-price">
                                 <span class="price-amount">1,299</span>
-                                <span class="price-currency">SAR</span>
+                                <span class="price-currency"><span class="sar-symbol">&#xEA;</span></span>
                                 <span class="price-period">/ month</span>
                             </div>
                             <span class="subscription-discount">Up to 4 members</span>
@@ -1932,14 +1933,14 @@
                 <div class="subscription-card" data-features='["Full day access","All gym facilities","Group classes","Temporary locker"]'>
                     <div class="subscription-header">
                         <div class="subscription-icon">
-                            <i class="fas fa-ticket-alt"></i>
+                             <i class="fas fa-user-friends fa-xs" aria-hidden="true"></i>
                         </div>
                         <div class="subscription-header-info">
-                            <h3 class="subscription-name">Day Pass</h3>
+                            <h3 class="subscription-name">Family Mini Plan</h3>
                             <p class="subscription-tagline">Try before you commit</p>
                             <div class="subscription-price">
                                 <span class="price-amount">50</span>
-                                <span class="price-currency">SAR</span>
+                                <span class="price-currency"><span class="sar-symbol">&#xEA;</span></span>
                                 <span class="price-period">/ day</span>
                             </div>
                             <span class="subscription-status status-inactive">Inactive</span>
@@ -2065,7 +2066,7 @@
                     <!-- Pricing -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Price (SAR) <span class="required">*</span></label>
+                            <label>Price <span class="sar-symbol">&#xEA;</span> <span class="required">*</span></label>
                             <input type="number" class="form-control" id="price" name="price" placeholder="199.00" step="0.01" min="0" required>
                         </div>
                         <div class="form-group">
@@ -2561,7 +2562,7 @@
                     <p class="subscription-tagline">${data.tagline || ''}</p>
                     <div class="subscription-price">
                         <span class="price-amount">${parseFloat(data.price).toFixed(0)}</span>
-                        <span class="price-currency">SAR</span>
+                        <span class="price-currency"><span class="sar-symbol">&#xEA;</span></span>
                         <span class="price-period">${getPeriodText(data.period)}</span>
                     </div>
                     ${discountBadge}

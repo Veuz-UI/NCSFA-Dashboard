@@ -116,7 +116,7 @@
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             font-size: 12px;
             white-space: nowrap;
             overflow: hidden;
@@ -356,13 +356,14 @@
 
         .activity-content {
             padding: 20px;
+            
         }
 
         .activity-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
+            /* margin-bottom: 16px; */
         }
 
         .activity-title {

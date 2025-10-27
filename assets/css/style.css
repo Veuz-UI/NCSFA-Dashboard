@@ -143,6 +143,13 @@
             }
         }
 
+        .sar-symbol {
+            font-family: 'Untitled2' !important;
+            vertical-align: middle;
+            margin-right: 0.25em;
+            font-size: 22px
+        }
+
         .header-left {
             flex: 1;
         }
