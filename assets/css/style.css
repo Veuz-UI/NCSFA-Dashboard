@@ -1,0 +1,203 @@
+        body {
+            font-family: 'Loew Next' !important;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font-family: 'Loew Next' !important;
+        }
+
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--orange-color);
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #636e72;
+            font-size: 16px;
+        }
+
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            color: var(--black-color);
+        }
+
+        .icon-button:hover {
+            background: #f8f9fa;
+            border-color: var(--orange-color);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--orange-color);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px 6px 6px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .profile-section:hover {
+            border-color: var(--orange-color);
+            box-shadow: 0 2px 8px rgba(255, 140, 0, 0.1);
+        }
+
+        .profile-pic {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--orange-color), #e67e22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--black-color);
+            white-space: nowrap;
+        }
+
+        .header {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: self-start;
+            gap: 20px;
+        }
+
+        .header-actionbet_end {
+            justify-content: end;
+            margin-bottom: 20px;
+        }
+
+        .sidebar.collapsed .nav-group .nav-item .caret {
+            display: none;
+        }
+        
+
+        @media (max-width: 768px) {
+            .header {
+                margin-bottom: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+                padding-top: 60px;
+            }
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--black-color);
+            margin-bottom: 6px;
+        }
+
+        .sub-menu a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 36px;
+            color: white !important;
+            text-decoration: none !important;
+            font-size: 13px;
+            background: transparent;
+            border-left: 1px solid #ffffff1f;
+            margin-left: 34px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+
+        .header p {
+            color: #636e72;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .header p {
+                font-size: 13px;
+            }
+        }
+
+        .search-container {
+            position: relative;
+            width: 280px;
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                width: 100%;
+            }
+        }
+
+
+        @media (max-width: 768px) {
+            .profile-name {
+                display: none;
+            }
+        }

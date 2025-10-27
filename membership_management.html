@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCSFA - Membership Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/fonts/webfont/stylesheet.css">
+    <link rel="stylesheet" href="assets/fonts/main_font/stylesheet.css">
+    <style>
+        :root{
+            --black-color:#000;
+            --orange-color:#FF5A19;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Loew Next', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%);
+            color: var(--black-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles (same as index) */
+        .sidebar {
+            width: 240px;
+            background: var(--black-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .nav-group { display: block; }
+        .nav-group .nav-item { position: relative; }
+        .nav-group .nav-item .caret { margin-left: auto; transition: transform 0.25s ease; color: rgba(255,255,255,0.9); font-size: 12px; display:flex; align-items:center; }
+        .nav-group.open .nav-item .caret { transform: rotate(90deg); }
+
+        .sub-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s ease;
+            margin-left: 4px;
+        }
+        .nav-group.open .sub-menu { max-height: 600px; }
+
+        .sub-menu a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 36px;
+            color: white !important;
+            text-decoration: none !important;
+            font-size: 13px;
+            background: transparent;
+        }
+        .sub-menu a:hover {
+            background: rgba(255,140,0,0.08);
+        }
+
+        .sidebar.collapsed .sub-menu { display: none !important; }
+
+        .logo {
+            padding: 0 20px 8px;
+            border-bottom: 1px solid rgba(255, 140, 0, 0.3);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            min-height: 75px; 
+        }
+        
+        .logo img{
+            width: 100%;
+        }
+
+        .collaps_logo{
+            display: none;
+        }
+
+        .sidebar.collapsed .collaps_logo{
+            display: block;
+            width: 100%;
+            margin: auto;
+        }
+
+        .sidebar.collapsed .main_logo{
+            display: none;
+        }
+
+        .menu-toggle {
+            position: absolute;
+            top: 75px;
+            right: -20px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 3px solid var(--orange-color);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 3px 15px rgba(255, 140, 0, 0.4);
+        }
+
+        .menu-toggle:hover {
+            background: var(--orange-color);
+            transform: scale(1.15);
+            box-shadow: 0 5px 20px rgba(255, 140, 0, 0.6);
+        }
+
+        .menu-toggle::before {
+            content: '\f053';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 18px;
+            color: var(--orange-color);
+            transition: all 0.3s;
+        }
+
+        .menu-toggle:hover::before {
+            color: white;
+        }
+
+        .sidebar.collapsed .menu-toggle::before {
+            content: '\f054';
+        }
+
+        .nav-item {
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            color: white !important;
+            text-decoration: none !important;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--orange-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 140, 0, 0.1);
+        }
+
+        .nav-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(255, 140, 0, 0.2) 0%, rgba(255, 140, 0, 0.05) 100%);
+            border-left: 3px solid var(--orange-color);
+        }
+
+        .nav-item .icon {
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover .icon {
+            background: rgba(255, 140, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .nav-item.active .icon {
+            background: rgba(255, 140, 0, 0.3);
+            box-shadow: 0 0 12px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-item .text {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 12px 10px;
+        }
+
+        .sidebar.collapsed .nav-item .text {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item.active {
+            border-left: none;
+            border-right: 3px solid var(--orange-color);
+        }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1002;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-toggle span {
+            width: 22px;
+            height: 2px;
+            background: var(--black-color);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                height: 100vh;
+                width: 280px;
+                z-index: 999;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.mobile-active {
+                left: 0;
+            }
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+            }
+        }
+
+        .header {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-left h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--black-color);
+        }
+
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-container {
+            position: relative;
+            width: 280px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #636e72;
+            font-size: 16px;
+        }
+
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            color: var(--black-color);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--orange-color);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px 6px 6px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .profile-pic {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--orange-color), #e67e22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: self-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-box:nth-child(1) .stat-icon {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+        }
+
+        .stat-box:nth-child(2) .stat-icon {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196f3;
+        }
+
+        .stat-box:nth-child(3) .stat-icon {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--orange-color);
+        }
+
+        .stat-box:nth-child(4) .stat-icon {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9c27b0;
+        }
+
+        .stat-content h3 {
+            font-size: 13px;
+            color: #636e72;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-content .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--black-color);
+            margin-bottom: 4px;
+        }
+
+        .stat-content p {
+            font-size: 12px;
+            color: #95a5a6;
+        }
+
+        .stat-dropdown {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-left: auto;
+        }
+
+        /* Table Section */
+        .table-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--black-color);
+        }
+
+
+        .table-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-btn, .view-btn, .export-btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover, .view-btn:hover {
+            border-color: var(--orange-color);
+            color: var(--orange-color);
+        }
+
+        .export-btn {
+            background: var(--black-color);
+            color: white;
+            border-color: var(--black-color);
+        }
+
+        .export-btn:hover {
+            background: var(--orange-color);
+            border-color: var(--orange-color);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #636e72;
+            text-transform: uppercase;
+        }
+
+        th:first-child {
+            width: 40px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f1f3f5;
+            transition: all 0.3s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--black-color);
+        }
+
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+
+
+        .subscription-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .subscription-badge.potential {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+
+        .subscription-badge.member {
+            background: rgba(156, 39, 176, 0.15);
+            color: #9c27b0;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge.subscribed {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+
+        .status-badge.subscribe {
+            background: rgba(149, 165, 166, 0.15);
+            color: #636e72;
+        }
+
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .view-link {
+            color: #636e72;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .view-link:hover {
+            color: var(--orange-color);
+        }
+
+        .more-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #636e72;
+            padding: 4px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .items-per-page {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #636e72;
+        }
+
+        .items-per-page select {
+            padding: 6px 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .pagination-info {
+            font-size: 13px;
+            color: #636e72;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .page-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover {
+            border-color: var(--orange-color);
+            color: var(--orange-color);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding-top: 60px;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .table-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
+
+               .nav-group { display: block; }
+        .nav-group .nav-item { position: relative; }
+        .nav-group .nav-item .caret { margin-left: auto; transition: transform 0.25s ease; color: rgba(255,255,255,0.9); font-size: 12px; display:flex; align-items:center; }
+        .nav-group.open .nav-item .caret { transform: rotate(90deg); }
+
+        .sub-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s ease;
+            margin-left: 4px;
+        }
+        .nav-group.open .sub-menu { max-height: 600px; /* enough for a few items */ }
+
+        .sub-menu a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 36px;
+            color: white !important;
+            text-decoration: none !important;
+            font-size: 13px;
+            background: transparent;
+        }
+        .sub-menu a:hover {
+            background: rgba(255,140,0,0.08);
+        }
+
+        /* hide submenu when sidebar is collapsed */
+        .sidebar.collapsed .sub-menu { display: none !important; }
+
+    </style>
+</head>
+<body>
+    <button class="mobile-toggle" id="mobileToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="container">
+      <div class="sidebar" id="sidebar">
+            <button class="menu-toggle" id="menuToggle"></button>
+            
+            <div class="logo">
+                <img class="main_logo" src="assets/img/logo.png" alt="">
+                <img class="collaps_logo" src="assets/img/logo_fav.png" alt="">
+            </div>
+            <a href="index.html" class="nav-item ">
+                    <span class="icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="text">Dashboard</span>
+                </a>
+
+                 <div class="nav-group">
+                    <a href="#" class="nav-item nav-toggle">
+                        <span class="icon"><i class="fas fa-building"></i></span>
+                        <span class="text">Club Management</span>
+                        <span class="caret"><i class="fas fa-chevron-right"></i></span>
+                    </a>
+                    <div class="sub-menu">
+                       <!-- <a href="#" class="nav-item active" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                            </a> -->
+                     <a href="club_management.html" class="nav-item" data-page="clubs">
+                            <i class="fas fa-building"></i>
+                            <span>Clubs</span>
+                        </a>
+                        <a href="facilities-page.html" class="nav-item" data-page="facilities">
+                            <i class="fas fa-door-open"></i>
+                            <span>Facilities</span>
+                        </a>
+                        <a href="activity_master.html" class="nav-item" data-page="activities">
+                            <i class="fas fa-running"></i>
+                            <span>Activities</span>
+                        </a>
+                         <a href="location_master.html" class="nav-item" data-page="locationmaster">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Location Master</span>
+                        </a>
+    
+                        
+                    </div>
+                </div>
+
+
+                <a href="promocode_management.html" class="nav-item">
+                <span class="icon"><i class="fas fa-tags"></i></span>
+                <span class="text">Promocode Management</span>
+                </a>
+
+               
+                <a href="membership_management.html" class="nav-item active">
+                    <span class="icon"><i class="fas fa-users"></i></span>
+                    <span class="text">Membership Management</span>
+                </a>
+
+                <a href="subscription.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-credit-card"></i></span>
+                    <span class="text">Subscriptions/Plans</span>
+                </a>
+
+                   <a href="subscription.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-ticket-alt"></i></span>
+                    <span class="text">Bookings</span>
+                    </a>
+
+                     <a href="subscription.html" class="nav-item">
+                        <span class="icon"><i class="fas fa-bell"></i></span>
+                        <span class="text">Alerts/Notifications</span>
+                        </a>
+
+                      <a href="subscription.html" class="nav-item">
+                        <span class="icon"><i class="fas fa-id-card"></i></span>
+                        <span class="text">Issue Card Management</span>
+                        </a>
+
+                    <div class="nav-group">
+                    <a href="#" class="nav-item nav-toggle">
+                        <span class="icon"><i class="fas fa-building"></i></span>
+                        <span class="text">Users</span>
+                        <span class="caret"><i class="fas fa-chevron-right"></i></span>
+                    </a>
+                    <div class="sub-menu">
+                         <a href="#" class="nav-item" data-page="trainer">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Administrators</span>
+                        </a>
+
+
+                        <a href="#" class="nav-item" data-page="traner">
+                            <i class="fas fa-running"></i>
+                            <span>Trainers</span>
+                        </a> 
+
+                        <a href="#" class="nav-item" data-page="traner">
+                            <i class="fas fa-hands-helping"></i>
+                            <span>Volunteer</span>
+                        </a> 
+                       
+                    </div>
+                </div>
+
+                    <a href="subscription.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-user-tag"></i></span>
+                    <span class="text">Roles</span>
+                    </a>
+
+                     <a href="subscription.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-wallet"></i></span>
+                    <span class="text">Finance Management</span>
+                    </a>
+
+                          <a href="subscription.html" class="nav-item">
+                        <span class="icon"><i class="fas fa-clipboard-list"></i></span>
+                        <span class="text">Log and Audit Trails</span>
+                        </a>
+
+
+        
+
+                <a href="attendance-report.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-clipboard-list"></i></span>
+                    <span class="text">Attendance Report</span>
+                </a>
+
+
+                <a href="device-management.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-mobile-alt"></i></span>
+                    <span class="text">Device Management</span>
+                </a>
+
+
+
+                <a href="requests.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-file-alt"></i></span>
+                    <span class="text">Requests</span>
+                </a>
+
+                <a href="settings.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-cog"></i></span>
+                    <span class="text">Settings</span>
+                </a>
+
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <h1><span>Membership</span> Management</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search..." id="searchInput">
+                    </div>
+                    <button class="icon-button">
+                        <i class="fas fa-bell" style="font-size: 18px;"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+                    <div class="profile-section">
+                        <div class="profile-pic">AD</div>
+                        <span class="profile-name">Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Members</h3>
+                            <div class="stat-number">30</div>
+                            <p>Across all cities</p>
+                        </div>
+                        <div class="stat-dropdown">This Week <i class="fas fa-caret-down"></i></div>
+                    </div>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Active Subscriptions</h3>
+                            <div class="stat-number">12</div>
+                            <p>Currently operational</p>
+                        </div>
+                        <div class="stat-dropdown">This Week <i class="fas fa-caret-down"></i></div>
+                    </div>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Today's Registrations</h3>
+                            <div class="stat-number">18</div>
+                            <p>Currently operational</p>
+                        </div>
+                        <div class="stat-dropdown">This Week <i class="fas fa-caret-down"></i></div>
+                    </div>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Expired Subscriptions</h3>
+                            <div class="stat-number">12</div>
+                            <p>Currently operational</p>
+                        </div>
+                        <div class="stat-dropdown">This Week <i class="fas fa-caret-down"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h2 class="table-title"><span>Membership</span> Manage</h2>
+                    <div class="table-actions">
+                        <div class="search-container" style="width: 250px;">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Search..." id="tableSearch">
+                        </div>
+                        <button class="filter-btn">
+                            Filter <i class="fas fa-filter"></i>
+                        </button>
+                        <button class="export-btn">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="membersTable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" class="checkbox" id="selectAll"></th>
+                                <th>SI.No</th>
+                                <th>Name</th>
+                                <th><span class="membership-badge">Membership</span> ID</th>
+                                <th>Phone Number</th>
+                                <th>Date</th>
+                                <th>Gender</th>
+                                <th>Subscription</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Rows will be dynamically inserted -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <div class="items-per-page">
+                        <select id="itemsPerPage">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span>Items per page</span>
+                        <span id="itemsInfo">1-10 of 200 Items</span>
+                    </div>
+                    <div class="pagination-info">
+                        <span id="pageInfo">1 of 44 pages</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="page-btn" id="prevPage">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="page-btn" id="nextPage">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Data
+        const members = [];
+        for (let i = 1; i <= 200; i++) {
+            const subscriptionTypes = ['Potential Member', 'Member'];
+            const statuses = ['Subscribed', 'Subscribe'];
+            const genders = ['Male', 'Female'];
+            
+            members.push({
+                id: i,
+                name: 'Aboo Kandkhril',
+                membershipId: 'NS833083',
+                phone: '0557860182',
+                date: '19-07-2023',
+                gender: genders[Math.floor(Math.random() * genders.length)],
+                subscription: subscriptionTypes[Math.floor(Math.random() * subscriptionTypes.length)],
+                status: statuses[Math.floor(Math.random() * statuses.length)]
+            });
+        }
+
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let filteredMembers = [...members];
+
+        // Sidebar functionality
+        const mobileToggle = document.getElementById('mobileToggle');
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        mobileToggle.addEventListener('click', function() {
+            mobileToggle.classList.toggle('active');
+            sidebar.classList.toggle('mobile-active');
+            sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', function() {
+            mobileToggle.classList.remove('active');
+            sidebar.classList.remove('mobile-active');
+            sidebarOverlay.classList.remove('active');
+        });
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (item.classList.contains('nav-toggle')) {
+                    e.preventDefault();
+                    const group = item.parentElement;
+                    group.classList.toggle('open');
+                    return;
+                }
+
+                if (window.innerWidth <= 1024) {
+                    mobileToggle.classList.remove('active');
+                    sidebar.classList.remove('mobile-active');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1024) {
+                sidebar.classList.remove('mobile-active');
+                sidebarOverlay.classList.remove('active');
+                mobileToggle.classList.remove('active');
+            } else {
+                sidebar.classList.remove('collapsed');
+            }
+        });
+
+        // Render Table
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageMembers = filteredMembers.slice(startIndex, endIndex);
+
+            pageMembers.forEach((member, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="checkbox"></td>
+                    <td>#${String(member.id).padStart(2, '0')}</td>
+                    <td>${member.name}</td>
+                    <td>${member.membershipId}</td>
+                    <td>${member.phone}</td>
+                    <td>${member.date}</td>
+                    <td>${member.gender}</td>
+                    <td>
+                        <span class="subscription-badge ${member.subscription === 'Potential Member' ? 'potential' : 'member'}">
+                            ${member.subscription}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge ${member.status.toLowerCase()}">
+                            ${member.status}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <a href="#" class="view-link">
+                                View <i class="fas fa-eye"></i>
+                            </a>
+                            <button class="more-btn">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            updatePaginationInfo();
+        }
+
+        // Update Pagination Info
+        function updatePaginationInfo() {
+            const totalItems = filteredMembers.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage + 1;
+            const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+
+            document.getElementById('itemsInfo').textContent = `${startIndex}-${endIndex} of ${totalItems} Items`;
+            document.getElementById('pageInfo').textContent = `${currentPage} of ${totalPages} pages`;
+
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        // Items Per Page Change
+        document.getElementById('itemsPerPage').addEventListener('change', (e) => {
+            itemsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderTable();
+        });
+
+        // Pagination Controls
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        });
+
+        // Select All Checkbox
+        document.getElementById('selectAll').addEventListener('change', (e) => {
+            const checkboxes = document.querySelectorAll('#tableBody .checkbox');
+            checkboxes.forEach(cb => cb.checked = e.target.checked);
+        });
+
+        // Search Functionality
+        const tableSearch = document.getElementById('tableSearch');
+        tableSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            filteredMembers = members.filter(member => {
+                return member.name.toLowerCase().includes(searchTerm) ||
+                       member.membershipId.toLowerCase().includes(searchTerm) ||
+                       member.phone.includes(searchTerm) ||
+                       member.subscription.toLowerCase().includes(searchTerm);
+            });
+
+            currentPage = 1;
+            renderTable();
+        });
+
+        // Header Search
+        const headerSearch = document.getElementById('searchInput');
+        headerSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            filteredMembers = members.filter(member => {
+                return member.name.toLowerCase().includes(searchTerm) ||
+                       member.membershipId.toLowerCase().includes(searchTerm) ||
+                       member.phone.includes(searchTerm);
+            });
+
+            currentPage = 1;
+            renderTable();
+        });
+
+        // Initial Render
+        renderTable();
+    </script>
+</body>
+</html>

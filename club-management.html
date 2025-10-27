@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/club-styles.css">
+    <link rel="stylesheet" href="assets/fonts/main_font/stylesheet.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        :root {
+            --black-color: #000;
+            --orange-color: #FF5A19;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Loew Next';
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%);
+            color: var(--black-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+         .sidebar {
+            width: 240px;
+            background: var(--black-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+            /* overflow-y: auto;
+            overflow-x: visible; */
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+
+        .nav-group { display: block; }
+        .nav-group .nav-item { position: relative; }
+        .nav-group .nav-item .caret { margin-left: auto; transition: transform 0.25s ease; color: rgba(255,255,255,0.9); font-size: 12px; display:flex; align-items:center; }
+        .nav-group.open .nav-item .caret { transform: rotate(90deg); }
+
+        .sub-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s ease;
+            margin-left: 4px;
+        }
+        .nav-group.open .sub-menu { max-height: 600px; /* enough for a few items */ }
+
+        .sub-menu a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 36px;
+            color: white !important;
+            text-decoration: none !important;
+            font-size: 13px;
+            background: transparent;
+        }
+        .sub-menu a:hover {
+            background: rgba(255,140,0,0.08);
+        }
+
+        /* hide submenu when sidebar is collapsed */
+        .sidebar.collapsed .sub-menu { display: none !important; }
+
+
+        .logo {
+            padding: 0 20px 8px;
+            border-bottom: 1px solid rgba(255, 140, 0, 0.3);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            min-height: 75px; 
+        }
+        
+        .logo img{
+            width: 100%;
+        }
+
+        .collaps_logo{
+            display: none;
+        }
+
+        .sidebar.collapsed .collaps_logo{
+            display: block;
+            width: 100%;
+            margin: auto;
+        }
+
+        .sidebar.collapsed .main_logo{
+            display: none;
+        }
+
+        .sidebar.collapsed .logo p {
+            display: none;
+        }
+
+        .menu-toggle {
+            position: absolute;
+            top: 75px;
+            right: -20px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 3px solid var(--orange-color);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 3px 15px rgba(255, 140, 0, 0.4);
+        }
+
+        .menu-toggle:hover {
+            background: var(--orange-color);
+            transform: scale(1.15);
+            box-shadow: 0 5px 20px rgba(255, 140, 0, 0.6);
+        }
+
+        .menu-toggle::before {
+            content: '\f053';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 18px;
+            color: var(--orange-color);
+            transition: all 0.3s;
+        }
+
+        .menu-toggle:hover::before {
+            color: white;
+        }
+
+        .sidebar.collapsed .menu-toggle {
+            right: -20px;
+        }
+
+        .sidebar.collapsed .menu-toggle::before {
+            content: '\f054';
+        }
+
+          .nav-item {
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            color: white !important;
+            text-decoration: none !important;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--orange-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 140, 0, 0.1);
+        }
+
+        .nav-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(255, 140, 0, 0.2) 0%, rgba(255, 140, 0, 0.05) 100%);
+            border-left: 3px solid var(--orange-color);
+        }
+
+        .nav-item .icon {
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover .icon {
+            background: rgba(255, 140, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .nav-item.active .icon {
+            background: rgba(255, 140, 0, 0.3);
+            box-shadow: 0 0 12px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-item .text {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 12px 10px;
+        }
+
+        .sidebar.collapsed .nav-item .text {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item.active {
+            border-left: none;
+            border-right: 3px solid var(--orange-color);
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1002;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-toggle:hover {
+            background: #f8f9fa;
+            border-color: var(--orange-color);
+        }
+
+        .mobile-toggle span {
+            width: 22px;
+            height: 2px;
+            background: var(--black-color);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .mobile-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+            background: var(--orange-color);
+        }
+
+        .mobile-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+            background: var(--orange-color);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                height: 100vh;
+                width: 280px;
+                z-index: 999;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.mobile-active {
+                left: 0;
+            }
+
+            .sidebar.collapsed {
+                width: 280px;
+            }
+
+            .container {
+                flex-direction: row;
+            }
+        }
+
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 24px 32px;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--orange-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #e64e15;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 90, 25, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--black-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--orange-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stat-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-card-value {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--black-color);
+            margin-bottom: 8px;
+        }
+
+        .stat-card-label {
+            font-size: 14px;
+            color: #636e72;
+        }
+
+        .stat-card-change {
+            font-size: 12px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-card-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-card-change.negative {
+            color: var(--danger-color);
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f1f3;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--black-color);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--black-color);
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f1f3;
+            font-size: 14px;
+            color: #636e72;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .action-btn.edit {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .action-btn.edit:hover {
+            background: #1976d2;
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .action-btn.delete:hover {
+            background: #c62828;
+            color: white;
+        }
+
+        .action-btn.view {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .action-btn.view:hover {
+            background: #7b1fa2;
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 2px solid #f0f1f3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--black-color);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f0f1f3;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--black-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--orange-color);
+            box-shadow: 0 0 0 3px rgba(255, 90, 25, 0.1);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 2px solid #f0f1f3;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Search and Filter */
+        .search-filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--orange-color);
+            box-shadow: 0 0 0 3px rgba(255, 90, 25, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #636e72;
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--orange-color);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #636e72;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--orange-color);
+        }
+
+        .tab.active {
+            color: var(--orange-color);
+            border-bottom-color: var(--orange-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .clubs-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* exactly 3 columns */
+        gap: 24px;
+        padding: 20px 0;
+        }
+
+        
+.club-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s;
+}
+
+.club-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.club-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.club-details {
+    padding: 20px;
+}
+
+.club-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.club-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 12px 0;
+    color: var(--black-color);
+}
+
+.club-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    margin-bottom: 16px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #636e72;
+    font-size: 14px;
+}
+
+.club-activities {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+}
+
+.activity-tag {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    background: #f0f1f3;
+    color: #636e72;
+}
+
+.club-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f1f3;
+}
+
+.action-button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.manage-btn {
+    background: var(--orange-color);
+    color: white;
+    border: none;
+}
+
+.manage-btn:hover {
+    background: #e64e15;
+}
+
+.restrict-btn {
+    background: #f0f1f3;
+    color: #636e72;
+    border: none;
+}
+
+.restrict-btn:hover {
+    background: #e0e0e0;
+}
+
+.icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--orange-color);
+    color: #29a92f;
+    /* margin-right: 12px; */
+    transition: all 0.3s ease;
+}
+
+.icon-box.green {
+    background: #c0ffc3;
+}
+
+
+
+.icon-box i {
+    font-size: 18px;
+}
+
+.icon-box:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Update info-item to use the new icon-box */
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #636e72;
+    font-size: 14px;
+    padding: 2px 0;
+}
+
+.info-item span {
+    flex: 1;
+}
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -240px;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+            }
+
+            .sidebar.mobile-active {
+                left: 0;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+
+            .main-content {
+                padding: 80px 20px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .search-filter-bar {
+                flex-direction: column;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+        }
+
+        /* Additional Utility Classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+        .d-flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .align-center { align-items: center; }
+        .gap-10 { gap: 10px; }
+
+               .nav-group { display: block; }
+        .nav-group .nav-item { position: relative; }
+        .nav-group .nav-item .caret { margin-left: auto; transition: transform 0.25s ease; color: rgba(255,255,255,0.9); font-size: 12px; display:flex; align-items:center; }
+        .nav-group.open .nav-item .caret { transform: rotate(90deg); }
+
+        .sub-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s ease;
+            margin-left: 4px;
+        }
+        .nav-group.open .sub-menu { max-height: 600px; /* enough for a few items */ }
+
+        .sub-menu a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 36px;
+            color: white !important;
+            text-decoration: none !important;
+            font-size: 13px;
+            background: transparent;
+        }
+        .sub-menu a:hover {
+            background: rgba(255,140,0,0.08);
+        }
+
+        /* hide submenu when sidebar is collapsed */
+        .sidebar.collapsed .sub-menu { display: none !important; }
+
+    </style>
+</head>
+<body>
+        <button class="mobile-toggle" id="mobileToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+            
+            <div class="logo">
+                <img class="main_logo" src="assets/img/logo.png" alt="">
+                <img class="collaps_logo" src="assets/img/logo_fav.png" alt="">
+            </div>
+            <a href="index.html" class="nav-item active">
+                    <span class="icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="text">Dashboard</span>
+                </a>
+
+                 <div class="nav-group">
+                    <a href="#" class="nav-item nav-toggle">
+                        <span class="icon"><i class="fas fa-building"></i></span>
+                        <span class="text">Club Management</span>
+                        <span class="caret"><i class="fas fa-chevron-right"></i></span>
+                    </a>
+                    <div class="sub-menu">
+                       <!-- <a href="#" class="nav-item active" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                            </a> -->
+                     <a href="club_management.html" class="nav-item" data-page="clubs">
+                            <i class="fas fa-building"></i>
+                            <span>Clubs</span>
+                        </a>
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+                        <a href="facilities-page.html" class="nav-item" data-page="facilities">
+                            <i class="fas fa-door-open"></i>
+                            <span>Facilities</span>
+                        </a>
+                        <a href="activity_master.html" class="nav-item" data-page="activities">
+                            <i class="fas fa-running"></i>
+                            <span>Activities</span>
+                        </a>
+                         <a href="location_master.html" class="nav-item" data-page="locationmaster">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Location Master</span>
+                        </a>
+    
+                        
+                    </div>
+                </div>
+
+
+                <a href="promocode_management.html" class="nav-item">
+                <span class="icon"><i class="fas fa-tags"></i></span>
+                <span class="text">Promocode Management</span>
+                </a>
+
+               
+                <a href="membership_management.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-users"></i></span>
+                    <span class="text">Membership Management</span>
+                </a>
+
+                <a href="subscription.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-credit-card"></i></span>
+                    <span class="text">Subscriptions/Plans</span>
+                </a>
+
+                   <a href="subscription.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-ticket-alt"></i></span>
+                    <span class="text">Bookings</span>
+                    </a>
+
+                     <a href="subscription.html" class="nav-item">
+                        <span class="icon"><i class="fas fa-bell"></i></span>
+                        <span class="text">Alerts/Notifications</span>
+                        </a>
+
+                      <a href="subscription.html" class="nav-item">
+                        <span class="icon"><i class="fas fa-id-card"></i></span>
+                        <span class="text">Issue Card Management</span>
+                        </a>
+
+                    <div class="nav-group">
+                    <a href="#" class="nav-item nav-toggle">
+                        <span class="icon"><i class="fas fa-building"></i></span>
+                        <span class="text">Users</span>
+                        <span class="caret"><i class="fas fa-chevron-right"></i></span>
+                    </a>
+                    <div class="sub-menu">
+                         <a href="#" class="nav-item" data-page="trainer">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Administrators</span>
+                        </a>
+
+
+                        <a href="#" class="nav-item" data-page="traner">
+                            <i class="fas fa-running"></i>
+                            <span>Trainers</span>
+                        </a> 
+
+                        <a href="#" class="nav-item" data-page="traner">
+                            <i class="fas fa-hands-helping"></i>
+                            <span>Volunteer</span>
+                        </a> 
+                       
+                    </div>
+                </div>
+
+                    <a href="subscription.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-user-tag"></i></span>
+                    <span class="text">Roles</span>
+                    </a>
+
+                     <a href="subscription.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-wallet"></i></span>
+                    <span class="text">Finance Management</span>
+                    </a>
+
+                          <a href="subscription.html" class="nav-item">
+                        <span class="icon"><i class="fas fa-clipboard-list"></i></span>
+                        <span class="text">Log and Audit Trails</span>
+                        </a>
+
+
+        
+
+                <a href="attendance-report.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-clipboard-list"></i></span>
+                    <span class="text">Attendance Report</span>
+                </a>
+
+
+                <a href="device-management.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-mobile-alt"></i></span>
+                    <span class="text">Device Management</span>
+                </a>
+
+
+
+                <a href="requests.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-file-alt"></i></span>
+                    <span class="text">Requests</span>
+                </a>
+
+                <a href="settings.html" class="nav-item">
+                    <span class="icon"><i class="fas fa-cog"></i></span>
+                    <span class="text">Settings</span>
+                </a>
+
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content">
+                <div class="header">
+                    <h1>Dashboard</h1>
+                    
+                      <div class="header-right">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search...">
+                    </div>
+                    <button class="icon-button">
+                        <i class="fas fa-bell" style="font-size: 18px;"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+                    <div class="profile-section">
+                        <div class="profile-pic">AD</div>
+                        <span class="profile-name">Admin</span>
+                    </div>
+                </div>
+                </div>
+
+                <div class="header-actions header-actionbet_end">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Export Report
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Data
+                        </button>
+                    </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-value">12</div>
+                                <div class="stat-card-label">Total Clubs</div>
+                            </div>
+                            <div class="stat-card-icon" style="background: var(--orange-color);">
+                                <i class="fas fa-building"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>2 new this month</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-value">48</div>
+                                <div class="stat-card-label">Active Facilities</div>
+                            </div>
+                            <div class="stat-card-icon" style="background: var(--success-color);">
+                                <i class="fas fa-door-open"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>5 added this week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-value">156</div>
+                                <div class="stat-card-label">Live Activities</div>
+                            </div>
+                            <div class="stat-card-icon" style="background: var(--info-color);">
+                                <i class="fas fa-running"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>12 ongoing sessions</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-value">2,543</div>
+                                <div class="stat-card-label">Active Members</div>
+                            </div>
+                            <div class="stat-card-icon" style="background: var(--black-color);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>85 joined this month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities and Quick Stats -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent Bookings</h3>
+                            <button class="btn btn-primary btn-icon">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Member</th>
+                                        <th>Activity</th>
+                                        <th>Facility</th>
+                                        <th>Date & Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Ahmed Al-Rashid</td>
+                                        <td>Swimming</td>
+                                        <td>Olympic Pool</td>
+                                        <td>Oct 25, 2025 10:00 AM</td>
+                                        <td><span class="badge badge-success">Confirmed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sarah Mohammed</td>
+                                        <td>Tennis</td>
+                                        <td>Court #1</td>
+                                        <td>Oct 25, 2025 2:00 PM</td>
+                                        <td><span class="badge badge-warning">Pending</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Khalid Hassan</td>
+                                        <td>Gym Training</td>
+                                        <td>Main Gym</td>
+                                        <td>Oct 25, 2025 6:00 PM</td>
+                                        <td><span class="badge badge-success">Confirmed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Today's Stats</h3>
+                        </div>
+                        <div style="padding: 20px 0;">
+                            <div style="margin-bottom: 24px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px; color: #636e72;">Check-ins</span>
+                                    <span style="font-weight: 600;">245</span>
+                                </div>
+                                <div style="height: 8px; background: #f0f1f3; border-radius: 4px; overflow: hidden;">
+                                    <div style="height: 100%; width: 78%; background: var(--orange-color);"></div>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 24px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px; color: #636e72;">Bookings</span>
+                                    <span style="font-weight: 600;">89</span>
+                                </div>
+                                <div style="height: 8px; background: #f0f1f3; border-radius: 4px; overflow: hidden;">
+                                    <div style="height: 100%; width: 56%; background: var(--success-color);"></div>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 24px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px; color: #636e72;">Classes</span>
+                                    <span style="font-weight: 600;">12</span>
+                                </div>
+                                <div style="height: 8px; background: #f0f1f3; border-radius: 4px; overflow: hidden;">
+                                    <div style="height: 100%; width: 85%; background: var(--info-color);"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px; color: #636e72;">Capacity</span>
+                                    <span style="font-weight: 600;">67%</span>
+                                </div>
+                                <div style="height: 8px; background: #f0f1f3; border-radius: 4px; overflow: hidden;">
+                                    <div style="height: 100%; width: 67%; background: var(--black-color);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clubs-grid">
+                        <div class="club-card">
+                            <img src="assets/img/club.png" alt="Club" class="club-image">
+                            <div class="club-details">
+                                <span class="club-status">Active</span>
+                                <h3 class="club-title">14th intermediate school female</h3>
+                                
+                            <div class="club-info">
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <span>club@example.com</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <span>+966 78788898</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <span>Jeddah KSA</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-fingerprint"></i>
+                            </div>
+                            <span>Device ID: #1424525</span>
+                        </div>
+                            </div>  
+                                <div class="club-activities">
+                                    <span class="activity-tag">Football</span>
+                                    <span class="activity-tag">Chess</span>
+                                    <span class="activity-tag">Swimming</span>
+                                </div>
+
+                                <div class="info-item">
+                                    <i class="fas fa-venus-mars"></i>
+                                    <span>Gender Restriction: Male Only</span>
+                                </div>
+
+                                <div class="club-actions">
+                                    <a href="#" class="action-button manage-btn">
+                                        <i class="fas fa-cog"></i>
+                                        Manage Subscription
+                                    </a>
+                                    <a href="#" class="action-button restrict-btn">
+                                        <i class="fas fa-clock"></i>
+                                        Time Slot
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="club-card">
+                            <img src="assets/img/club.png" alt="Club" class="club-image">
+                            <div class="club-details">
+                                <span class="club-status">Active</span>
+                                <h3 class="club-title">14th intermediate school female</h3>
+                                
+                            <div class="club-info">
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <span>club@example.com</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <span>+966 78788898</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <span>Jeddah KSA</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-fingerprint"></i>
+                            </div>
+                            <span>Device ID: #1424525</span>
+                        </div>
+                            </div>  
+                                <div class="club-activities">
+                                    <span class="activity-tag">Football</span>
+                                    <span class="activity-tag">Chess</span>
+                                    <span class="activity-tag">Swimming</span>
+                                </div>
+
+                                <div class="info-item">
+                                    <i class="fas fa-venus-mars"></i>
+                                    <span>Gender Restriction: Male Only</span>
+                                </div>
+
+                                <div class="club-actions">
+                                    <a href="#" class="action-button manage-btn">
+                                        <i class="fas fa-cog"></i>
+                                        Manage Subscription
+                                    </a>
+                                    <a href="#" class="action-button restrict-btn">
+                                        <i class="fas fa-clock"></i>
+                                        Time Slot
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="club-card">
+                            <img src="assets/img/club.png" alt="Club" class="club-image">
+                            <div class="club-details">
+                                <span class="club-status">Active</span>
+                                <h3 class="club-title">14th intermediate school female</h3>
+                                
+                            <div class="club-info">
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <span>club@example.com</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <span>+966 78788898</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <span>Jeddah KSA</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon-box green">
+                                <i class="fas fa-fingerprint"></i>
+                            </div>
+                            <span>Device ID: #1424525</span>
+                        </div>
+                            </div>  
+                                <div class="club-activities">
+                                    <span class="activity-tag">Football</span>
+                                    <span class="activity-tag">Chess</span>
+                                    <span class="activity-tag">Swimming</span>
+                                </div>
+
+                                <div class="info-item">
+                                    <i class="fas fa-venus-mars"></i>
+                                    <span>Gender Restriction: Male Only</span>
+                                </div>
+
+                                <div class="club-actions">
+                                    <a href="#" class="action-button manage-btn">
+                                        <i class="fas fa-cog"></i>
+                                        Manage Subscription
+                                    </a>
+                                    <a href="#" class="action-button restrict-btn">
+                                        <i class="fas fa-clock"></i>
+                                        Time Slot
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+            </div>
+
+            <!-- Clubs Page (Hidden by default) -->
+            <div id="clubs-page" class="page-content" style="display: none;">
+                <div class="header">
+                    <h1>Clubs Management</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="openModal('clubModal')">
+                            <i class="fas fa-plus"></i>
+                            Add New Club
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search and Filter Bar -->
+                <div class="search-filter-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search clubs by name, location...">
+                    </div>
+                    <select class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="maintenance">Under Maintenance</option>
+                    </select>
+                    <select class="filter-select">
+                        <option value="">All Cities</option>
+                        <option value="riyadh">Riyadh</option>
+                        <option value="jeddah">Jeddah</option>
+                        <option value="dammam">Dammam</option>
+                    </select>
+                </div>
+
+                <!-- Clubs Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">All Clubs</h3>
+                        <span style="color: #636e72; font-size: 14px;">Total: 12 clubs</span>
+                    </div>
+                    <div class="table-container">
+                        <table id="clubsTable">
+                            <thead>
+                                <tr>
+                                    <th>Club Name</th>
+                                    <th>Location</th>
+                                    <th>Facilities</th>
+                                    <th>Members</th>
+                                    <th>Status</th>
+                                    <th>Manager</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Al-Majd Sports Club</strong></td>
+                                    <td>Riyadh, Al-Olaya</td>
+                                    <td>6 facilities</td>
+                                    <td>453 members</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td>Ahmed Al-Rashid</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Royal Fitness Center</strong></td>
+                                    <td>Jeddah, Corniche</td>
+                                    <td>8 facilities</td>
+                                    <td>678 members</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td>Fatima Hassan</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Champion Sports Complex</strong></td>
+                                    <td>Dammam, Al-Faisaliyah</td>
+                                    <td>4 facilities</td>
+                                    <td>289 members</td>
+                                    <td><span class="badge badge-warning">Maintenance</span></td>
+                                    <td>Mohammed Saleh</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Club Modal -->
+    <div class="modal" id="clubModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Club</h2>
+                <button class="modal-close" onclick="closeModal('clubModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="clubForm">
+                    <div class="form-group">
+                        <label>Club Name *</label>
+                        <input type="text" class="form-control" placeholder="Enter club name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <input type="text" class="form-control" placeholder="Enter address" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City *</label>
+                        <select class="form-control" required>
+                            <option value="">Select city</option>
+                            <option value="riyadh">Riyadh</option>
+                            <option value="jeddah">Jeddah</option>
+                            <option value="dammam">Dammam</option>
+                            <option value="mecca">Mecca</option>
+                            <option value="medina">Medina</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Phone *</label>
+                        <input type="tel" class="form-control" placeholder="+966 XX XXX XXXX" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" class="form-control" placeholder="club@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Club Manager *</label>
+                        <select class="form-control" required>
+                            <option value="">Select manager</option>
+                            <option value="1">Ahmed Al-Rashid</option>
+                            <option value="2">Fatima Hassan</option>
+                            <option value="3">Mohammed Saleh</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Opening Hours *</label>
+                        <input type="text" class="form-control" placeholder="e.g., 6:00 AM - 11:00 PM" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select class="form-control" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="maintenance">Under Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-control" placeholder="Enter club description"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('clubModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="submitClubForm()">
+                    <i class="fas fa-save"></i>
+                    Save Club
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/club-management.js"></script>
+
+
+  <script>
+        const mobileToggle = document.getElementById('mobileToggle');
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        // Desktop toggle - collapse/expand sidebar
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        // Mobile toggle - show/hide sidebar
+        mobileToggle.addEventListener('click', function() {
+            mobileToggle.classList.toggle('active');
+            sidebar.classList.toggle('mobile-active');
+            sidebarOverlay.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking overlay
+        sidebarOverlay.addEventListener('click', function() {
+            mobileToggle.classList.remove('active');
+            sidebar.classList.remove('mobile-active');
+            sidebarOverlay.classList.remove('active');
+        });
+
+        // Close sidebar when clicking nav items on mobile
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                // if this is the toggle for a nav-group, open/close submenu instead of closing sidebar
+                if (item.classList.contains('nav-toggle')) {
+                    e.preventDefault();
+                    const group = item.parentElement;
+                    group.classList.toggle('open');
+                    return;
+                }
+
+                if (window.innerWidth <= 1024) {
+                    mobileToggle.classList.remove('active');
+                    sidebar.classList.remove('mobile-active');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1024) {
+                sidebar.classList.remove('mobile-active');
+                sidebarOverlay.classList.remove('active');
+                mobileToggle.classList.remove('active');
+            } else {
+                sidebar.classList.remove('collapsed');
+            }
+        });
+    </script>
+</body>
+</html>

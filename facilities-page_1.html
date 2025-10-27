@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facilities Management - Club Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --black-color: #000;
+            --orange-color: #FF5A19;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%);
+            color: var(--black-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 240px;
+            background: var(--black-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .logo {
+            padding: 0 20px 8px;
+            border-bottom: 1px solid rgba(255, 140, 0, 0.3);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            min-height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo h2 {
+            font-size: 20px;
+            color: var(--orange-color);
+            transition: all 0.3s ease;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            color: var(--orange-color);
+            display: none;
+        }
+
+        .sidebar.collapsed .logo h2 {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo-icon {
+            display: block;
+        }
+
+        .menu-toggle {
+            position: absolute;
+            top: 75px;
+            right: -20px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 3px solid var(--orange-color);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 3px 15px rgba(255, 140, 0, 0.4);
+        }
+
+        .menu-toggle:hover {
+            background: var(--orange-color);
+            transform: scale(1.15);
+            box-shadow: 0 5px 20px rgba(255, 140, 0, 0.6);
+        }
+
+        .menu-toggle::before {
+            content: '\f053';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 18px;
+            color: var(--orange-color);
+            transition: all 0.3s;
+        }
+
+        .menu-toggle:hover::before {
+            color: white;
+        }
+
+        .sidebar.collapsed .menu-toggle::before {
+            content: '\f054';
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--orange-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 140, 0, 0.1);
+        }
+
+        .nav-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(255, 140, 0, 0.2) 0%, rgba(255, 140, 0, 0.05) 100%);
+            border-left: 3px solid var(--orange-color);
+        }
+
+        .nav-item .icon {
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover .icon {
+            background: rgba(255, 140, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .nav-item.active .icon {
+            background: rgba(255, 140, 0, 0.3);
+            box-shadow: 0 0 12px rgba(255, 140, 0, 0.3);
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 12px 10px;
+        }
+
+        .sidebar.collapsed .nav-item .text {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item.active {
+            border-left: none;
+            border-right: 3px solid var(--orange-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+            transition: all 0.3s ease;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--black-color);
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            width: 320px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--orange-color);
+            box-shadow: 0 0 0 3px rgba(255, 90, 25, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: #636e72;
+        }
+
+        .add-btn {
+            padding: 12px 24px;
+            background: var(--orange-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(255, 90, 25, 0.2);
+        }
+
+        .add-btn:hover {
+            background: #e64e15;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 90, 25, 0.3);
+        }
+
+        .add-btn span {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* Facilities Grid */
+        .facilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .facility-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .facility-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .facility-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+        }
+
+        .facility-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .facility-card:hover .facility-image img {
+            transform: scale(1.1);
+        }
+
+        .facility-badges {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .badge-available {
+            background: rgba(40, 167, 69, 0.95);
+            color: white;
+        }
+
+        .badge-occupied {
+            background: rgba(255, 193, 7, 0.95);
+            color: #000;
+        }
+
+        .badge-maintenance {
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+        }
+
+        .badge-type {
+            background: rgba(23, 162, 184, 0.95);
+            color: white;
+        }
+
+        .facility-icon {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--orange-color);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .facility-content {
+            padding: 20px;
+        }
+
+        .facility-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .facility-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--black-color);
+            margin-bottom: 4px;
+        }
+
+        .facility-location {
+            font-size: 13px;
+            color: #636e72;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .facility-location::before {
+            content: '\f3c5';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--orange-color);
+        }
+
+        .facility-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .action-icon.edit {
+            background: rgba(23, 162, 184, 0.1);
+            color: #17a2b8;
+        }
+
+        .action-icon.edit:hover {
+            background: #17a2b8;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .action-icon.delete {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .action-icon.delete:hover {
+            background: #dc3545;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .facility-meta {
+            display: flex;
+            gap: 16px;
+            padding: 12px 0;
+            border-top: 2px solid #f0f1f3;
+            border-bottom: 2px solid #f0f1f3;
+            margin-bottom: 16px;
+        }
+
+        .meta-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: #b2bec3;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--black-color);
+        }
+
+        .facility-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--orange-color);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #636e72;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Mobile Responsive */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1002;
+            width: 40px;
+            height: 40px;
+            background: var(--orange-color);
+            border-radius: 8px;
+            cursor: pointer;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 15px rgba(255, 90, 25, 0.3);
+        }
+
+        .mobile-toggle span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 28px 32px;
+            border-bottom: 2px solid #f0f1f3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--black-color);
+            margin: 0;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f0f1f3;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 20px;
+            color: #636e72;
+        }
+
+        .modal-close:hover {
+            background: var(--orange-color);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 32px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--black-color);
+        }
+
+        .form-group label .required {
+            color: var(--orange-color);
+            margin-left: 4px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--orange-color);
+            box-shadow: 0 0 0 4px rgba(255, 90, 25, 0.1);
+        }
+
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23636e72' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #f8f9fa;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--orange-color);
+            background: rgba(255, 90, 25, 0.05);
+        }
+
+        .file-upload-icon {
+            font-size: 48px;
+            color: #e0e0e0;
+            margin-bottom: 12px;
+        }
+
+        .file-upload-text {
+            font-size: 14px;
+            color: #636e72;
+            margin-bottom: 8px;
+        }
+
+        .file-upload-subtext {
+            font-size: 12px;
+            color: #b2bec3;
+        }
+
+        #facilityImageInput {
+            display: none;
+        }
+
+        .image-preview {
+            display: none;
+            margin-top: 16px;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 200px;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .image-preview.active {
+            display: block;
+        }
+
+        .modal-footer {
+            padding: 20px 32px;
+            border-top: 2px solid #f0f1f3;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #f8f9fa;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .btn-cancel {
+            padding: 12px 24px;
+            background: white;
+            color: #636e72;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #f0f1f3;
+            border-color: #636e72;
+            color: var(--black-color);
+        }
+
+        .btn-submit {
+            padding: 12px 32px;
+            background: var(--orange-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: #e64e15;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 90, 25, 0.3);
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #b2bec3;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -240px;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+            }
+
+            .sidebar.mobile-active {
+                left: 0;
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+
+            .main-content {
+                padding: 80px 20px 20px;
+            }
+
+            .facilities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-actions {
+                flex-direction: column;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                max-height: 95vh;
+            }
+
+            .modal-header {
+                padding: 20px;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-footer {
+                padding: 16px 20px;
+                flex-direction: column;
+            }
+
+            .btn-cancel,
+            .btn-submit {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .facility-stats {
+                gap: 12px;
+            }
+
+            .stat-number {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 10px;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
+
+        @keyframes cardSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="menu-toggle" id="menuToggle"></div>
+            
+            <div class="logo">
+                <h2>Club Manager</h2>
+                <i class="fas fa-dumbbell logo-icon"></i>
+            </div>
+
+            <nav>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-home"></i></div>
+                    <span class="text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-building"></i></div>
+                    <span class="text">Clubs</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <div class="icon"><i class="fas fa-door-open"></i></div>
+                    <span class="text">Facilities</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-running"></i></div>
+                    <span class="text">Activities</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    <span class="text">Members</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-calendar-check"></i></div>
+                    <span class="text">Bookings</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-clipboard-check"></i></div>
+                    <span class="text">Attendance</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-user-tie"></i></div>
+                    <span class="text">Staff</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-credit-card"></i></div>
+                    <span class="text">Subscriptions</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-chart-line"></i></div>
+                    <span class="text">Reports</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="icon"><i class="fas fa-cog"></i></div>
+                    <span class="text">Settings</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Mobile Toggle -->
+        <div class="mobile-toggle" id="mobileToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Facilities Management</h1>
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search facilities...">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    <button class="add-btn">
+                        <span>+</span> Add New Facility
+                    </button>
+                </div>
+            </div>
+
+            <div class="facilities-grid">
+                <!-- Facility Card 1 - Olympic Pool -->
+                <div class="facility-card">
+                    <div class="facility-image">
+                        <img src="https://images.unsplash.com/photo-1519315901367-f34ff9154487?w=500&h=300&fit=crop" alt="Olympic Pool">
+                        <div class="facility-badges">
+                            <span class="badge badge-type">Pool</span>
+                            <span class="badge badge-available">Available</span>
+                        </div>
+                        <div class="facility-icon">
+                            <i class="fas fa-swimming-pool"></i>
+                        </div>
+                    </div>
+                    <div class="facility-content">
+                        <div class="facility-header">
+                            <div>
+                                <h3 class="facility-title">Olympic Pool</h3>
+                                <p class="facility-location">Al-Majd Sports Club, Riyadh</p>
+                            </div>
+                            <div class="facility-actions">
+                                <div class="action-icon edit"><i class="fas fa-edit"></i></div>
+                                <div class="action-icon delete"><i class="fas fa-trash-alt"></i></div>
+                            </div>
+                        </div>
+                        <div class="facility-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Capacity</div>
+                                <div class="meta-value">50</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Size</div>
+                                <div class="meta-value">50m</div>
+                            </div>
+                        </div>
+                        <div class="facility-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">8</div>
+                                <div class="stat-label">Activities</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">45</div>
+                                <div class="stat-label">Bookings</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">85%</div>
+                                <div class="stat-label">Usage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facility Card 2 - Main Gym -->
+                <div class="facility-card">
+                    <div class="facility-image">
+                        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop" alt="Main Gym">
+                        <div class="facility-badges">
+                            <span class="badge badge-type">Gym</span>
+                            <span class="badge badge-occupied">Occupied</span>
+                        </div>
+                        <div class="facility-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                    </div>
+                    <div class="facility-content">
+                        <div class="facility-header">
+                            <div>
+                                <h3 class="facility-title">Main Gym</h3>
+                                <p class="facility-location">Royal Fitness Center, Jeddah</p>
+                            </div>
+                            <div class="facility-actions">
+                                <div class="action-icon edit"><i class="fas fa-edit"></i></div>
+                                <div class="action-icon delete"><i class="fas fa-trash-alt"></i></div>
+                            </div>
+                        </div>
+                        <div class="facility-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Capacity</div>
+                                <div class="meta-value">80</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Size</div>
+                                <div class="meta-value">500m²</div>
+                            </div>
+                        </div>
+                        <div class="facility-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">12</div>
+                                <div class="stat-label">Activities</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">68</div>
+                                <div class="stat-label">Bookings</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">92%</div>
+                                <div class="stat-label">Usage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facility Card 3 - Tennis Court -->
+                <div class="facility-card">
+                    <div class="facility-image">
+                        <img src="https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=500&h=300&fit=crop" alt="Tennis Court">
+                        <div class="facility-badges">
+                            <span class="badge badge-type">Court</span>
+                            <span class="badge badge-available">Available</span>
+                        </div>
+                        <div class="facility-icon">
+                            <i class="fas fa-table-tennis"></i>
+                        </div>
+                    </div>
+                    <div class="facility-content">
+                        <div class="facility-header">
+                            <div>
+                                <h3 class="facility-title">Tennis Court #1</h3>
+                                <p class="facility-location">Al-Majd Sports Club, Riyadh</p>
+                            </div>
+                            <div class="facility-actions">
+                                <div class="action-icon edit"><i class="fas fa-edit"></i></div>
+                                <div class="action-icon delete"><i class="fas fa-trash-alt"></i></div>
+                            </div>
+                        </div>
+                        <div class="facility-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Capacity</div>
+                                <div class="meta-value">4</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Surface</div>
+                                <div class="meta-value">Clay</div>
+                            </div>
+                        </div>
+                        <div class="facility-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">3</div>
+                                <div class="stat-label">Activities</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">28</div>
+                                <div class="stat-label">Bookings</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">65%</div>
+                                <div class="stat-label">Usage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facility Card 4 - Yoga Studio -->
+                <div class="facility-card">
+                    <div class="facility-image">
+                        <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=500&h=300&fit=crop" alt="Yoga Studio">
+                        <div class="facility-badges">
+                            <span class="badge badge-type">Studio</span>
+                            <span class="badge badge-available">Available</span>
+                        </div>
+                        <div class="facility-icon">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                    </div>
+                    <div class="facility-content">
+                        <div class="facility-header">
+                            <div>
+                                <h3 class="facility-title">Yoga Studio</h3>
+                                <p class="facility-location">Royal Fitness Center, Jeddah</p>
+                            </div>
+                            <div class="facility-actions">
+                                <div class="action-icon edit"><i class="fas fa-edit"></i></div>
+                                <div class="action-icon delete"><i class="fas fa-trash-alt"></i></div>
+                            </div>
+                        </div>
+                        <div class="facility-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Capacity</div>
+                                <div class="meta-value">30</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Size</div>
+                                <div class="meta-value">200m²</div>
+                            </div>
+                        </div>
+                        <div class="facility-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">6</div>
+                                <div class="stat-label">Activities</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">52</div>
+                                <div class="stat-label">Bookings</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">78%</div>
+                                <div class="stat-label">Usage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facility Card 5 - Basketball Court -->
+                <div class="facility-card">
+                    <div class="facility-image">
+                        <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500&h=300&fit=crop" alt="Basketball Court">
+                        <div class="facility-badges">
+                            <span class="badge badge-type">Court</span>
+                            <span class="badge badge-maintenance">Maintenance</span>
+                        </div>
+                        <div class="facility-icon">
+                            <i class="fas fa-basketball-ball"></i>
+                        </div>
+                    </div>
+                    <div class="facility-content">
+                        <div class="facility-header">
+                            <div>
+                                <h3 class="facility-title">Basketball Court</h3>
+                                <p class="facility-location">Champion Sports Complex, Dammam</p>
+                            </div>
+                            <div class="facility-actions">
+                                <div class="action-icon edit"><i class="fas fa-edit"></i></div>
+                                <div class="action-icon delete"><i class="fas fa-trash-alt"></i></div>
+                            </div>
+                        </div>
+                        <div class="facility-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Capacity</div>
+                                <div class="meta-value">20</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Surface</div>
+                                <div class="meta-value">Indoor</div>
+                            </div>
+                        </div>
+                        <div class="facility-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">4</div>
+                                <div class="stat-label">Activities</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">Bookings</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">0%</div>
+                                <div class="stat-label">Usage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facility Card 6 - Dance Studio -->
+                <div class="facility-card">
+                    <div class="facility-image">
+                        <img src="https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=500&h=300&fit=crop" alt="Dance Studio">
+                        <div class="facility-badges">
+                            <span class="badge badge-type">Studio</span>
+                            <span class="badge badge-available">Available</span>
+                        </div>
+                        <div class="facility-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                    </div>
+                    <div class="facility-content">
+                        <div class="facility-header">
+                            <div>
+                                <h3 class="facility-title">Dance Studio</h3>
+                                <p class="facility-location">Royal Fitness Center, Jeddah</p>
+                            </div>
+                            <div class="facility-actions">
+                                <div class="action-icon edit"><i class="fas fa-edit"></i></div>
+                                <div class="action-icon delete"><i class="fas fa-trash-alt"></i></div>
+                            </div>
+                        </div>
+                        <div class="facility-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Capacity</div>
+                                <div class="meta-value">25</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Size</div>
+                                <div class="meta-value">150m²</div>
+                            </div>
+                        </div>
+                        <div class="facility-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">5</div>
+                                <div class="stat-label">Activities</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">38</div>
+                                <div class="stat-label">Bookings</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">72%</div>
+                                <div class="stat-label">Usage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Facility Modal -->
+    <div class="modal" id="facilityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Facility</h2>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="facilityForm">
+                    <input type="hidden" id="facilityId" name="facilityId">
+
+                    <!-- Facility Image Upload -->
+                    <div class="form-group full-width">
+                        <label>Facility Image <span class="required">*</span></label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <div class="file-upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="file-upload-text">
+                                Click to upload or drag and drop
+                            </div>
+                            <div class="file-upload-subtext">
+                                PNG, JPG or WEBP (max. 5MB)
+                            </div>
+                            <input type="file" id="facilityImageInput" name="facilityImage" accept="image/*">
+                        </div>
+                        <div class="image-preview" id="imagePreview">
+                            <img id="previewImg" src="" alt="Preview">
+                        </div>
+                    </div>
+
+                    <!-- Basic Information -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Facility Name <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="facilityName" name="facilityName" placeholder="e.g., Olympic Pool" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Facility Type <span class="required">*</span></label>
+                            <select class="form-control" id="facilityType" name="facilityType" required>
+                                <option value="">Select type</option>
+                                <option value="gym">Gym</option>
+                                <option value="pool">Swimming Pool</option>
+                                <option value="court">Sports Court</option>
+                                <option value="studio">Studio</option>
+                                <option value="track">Running Track</option>
+                                <option value="field">Sports Field</option>
+                                <option value="spa">Spa/Sauna</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Club <span class="required">*</span></label>
+                            <select class="form-control" id="facilityClub" name="facilityClub" required>
+                                <option value="">Select club</option>
+                                <option value="1">Al-Majd Sports Club - Riyadh</option>
+                                <option value="2">Royal Fitness Center - Jeddah</option>
+                                <option value="3">Champion Sports Complex - Dammam</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Floor/Building</label>
+                            <input type="text" class="form-control" id="floorBuilding" name="floorBuilding" placeholder="e.g., Ground Floor, Building A">
+                        </div>
+                    </div>
+
+                    <!-- Capacity and Size -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Maximum Capacity <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="maxCapacity" name="maxCapacity" placeholder="e.g., 50" min="1" required>
+                            <div class="form-hint">Maximum number of people</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Facility Size</label>
+                            <input type="text" class="form-control" id="facilitySize" name="facilitySize" placeholder="e.g., 500m² or 50m">
+                            <div class="form-hint">Area or dimensions</div>
+                        </div>
+                    </div>
+
+                    <!-- Operating Hours -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Opening Time <span class="required">*</span></label>
+                            <input type="time" class="form-control" id="openingTime" name="openingTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Closing Time <span class="required">*</span></label>
+                            <input type="time" class="form-control" id="closingTime" name="closingTime" required>
+                        </div>
+                    </div>
+
+                    <!-- Pricing and Status -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Hourly Rate (SAR)</label>
+                            <input type="number" class="form-control" id="hourlyRate" name="hourlyRate" placeholder="0.00" step="0.01" min="0">
+                            <div class="form-hint">Leave blank if not applicable</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Status <span class="required">*</span></label>
+                            <select class="form-control" id="facilityStatus" name="facilityStatus" required>
+                                <option value="available">Available</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="maintenance">Under Maintenance</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Booking Settings -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Advance Booking (days)</label>
+                            <input type="number" class="form-control" id="advanceBooking" name="advanceBooking" placeholder="7" min="1" value="7">
+                            <div class="form-hint">How many days in advance</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Max Booking Duration (hours)</label>
+                            <input type="number" class="form-control" id="maxDuration" name="maxDuration" placeholder="2" min="1" step="0.5">
+                            <div class="form-hint">Maximum hours per booking</div>
+                        </div>
+                    </div>
+
+                    <!-- Surface/Features -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Surface/Type Details</label>
+                            <input type="text" class="form-control" id="surfaceType" name="surfaceType" placeholder="e.g., Clay, Hardwood, Heated">
+                        </div>
+                        <div class="form-group">
+                            <label>Facility Manager</label>
+                            <select class="form-control" id="facilityManager" name="facilityManager">
+                                <option value="">Select manager</option>
+                                <option value="1">Ahmed Al-Rashid</option>
+                                <option value="2">Sarah Mohammed</option>
+                                <option value="3">Mohammed Saleh</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Amenities -->
+                    <div class="form-group full-width">
+                        <label>Amenities & Features</label>
+                        <textarea class="form-control" id="amenities" name="amenities" placeholder="List amenities like: Air conditioning, Lockers, Showers, WiFi, etc."></textarea>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group full-width">
+                        <label>Description</label>
+                        <textarea class="form-control" id="description" name="description" placeholder="Provide detailed information about this facility..."></textarea>
+                    </div>
+
+                    <!-- Rules and Regulations -->
+                    <div class="form-group full-width">
+                        <label>Rules & Regulations</label>
+                        <textarea class="form-control" id="rules" name="rules" placeholder="List any rules or regulations for using this facility..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button type="submit" form="facilityForm" class="btn-submit">
+                    <i class="fas fa-save"></i>
+                    <span id="submitBtnText">Save Facility</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const mobileToggle = document.getElementById('mobileToggle');
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const facilityModal = document.getElementById('facilityModal');
+        const facilityForm = document.getElementById('facilityForm');
+        let editingFacilityId = null;
+
+        // Sidebar functionality
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        mobileToggle.addEventListener('click', function() {
+            mobileToggle.classList.toggle('active');
+            sidebar.classList.toggle('mobile-active');
+            sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', function() {
+            mobileToggle.classList.remove('active');
+            sidebar.classList.remove('mobile-active');
+            sidebarOverlay.classList.remove('active');
+        });
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 1024) {
+                    mobileToggle.classList.remove('active');
+                    sidebar.classList.remove('mobile-active');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1024) {
+                sidebar.classList.remove('mobile-active');
+                sidebarOverlay.classList.remove('active');
+                mobileToggle.classList.remove('active');
+            } else {
+                sidebar.classList.remove('collapsed');
+            }
+        });
+
+        // Modal Functions
+        function openModal(mode = 'add', facilityData = null) {
+            facilityModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            if (mode === 'edit' && facilityData) {
+                document.getElementById('modalTitle').textContent = 'Edit Facility';
+                document.getElementById('submitBtnText').textContent = 'Update Facility';
+                editingFacilityId = facilityData.id;
+                populateForm(facilityData);
+            } else {
+                document.getElementById('modalTitle').textContent = 'Add New Facility';
+                document.getElementById('submitBtnText').textContent = 'Save Facility';
+                editingFacilityId = null;
+                facilityForm.reset();
+                document.getElementById('imagePreview').classList.remove('active');
+            }
+        }
+
+        function closeModal() {
+            facilityModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            facilityForm.reset();
+            editingFacilityId = null;
+            document.getElementById('imagePreview').classList.remove('active');
+        }
+
+        function populateForm(data) {
+            document.getElementById('facilityName').value = data.name || '';
+            document.getElementById('facilityType').value = data.type || '';
+            document.getElementById('facilityClub').value = data.club || '';
+            document.getElementById('floorBuilding').value = data.floor || '';
+            document.getElementById('maxCapacity').value = data.capacity || '';
+            document.getElementById('facilitySize').value = data.size || '';
+            document.getElementById('openingTime').value = data.openingTime || '';
+            document.getElementById('closingTime').value = data.closingTime || '';
+            document.getElementById('hourlyRate').value = data.rate || '';
+            document.getElementById('facilityStatus').value = data.status || 'available';
+            document.getElementById('surfaceType').value = data.surface || '';
+            document.getElementById('description').value = data.description || '';
+            
+            if (data.image) {
+                document.getElementById('previewImg').src = data.image;
+                document.getElementById('imagePreview').classList.add('active');
+            }
+        }
+
+        facilityModal.addEventListener('click', function(e) {
+            if (e.target === facilityModal) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && facilityModal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // File Upload Handling
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const facilityImageInput = document.getElementById('facilityImageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+
+        fileUploadArea.addEventListener('click', function() {
+            facilityImageInput.click();
+        });
+
+        facilityImageInput.addEventListener('change', function(e) {
+            handleImageUpload(e.target.files[0]);
+        });
+
+        fileUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--orange-color)';
+            fileUploadArea.style.background = 'rgba(255, 90, 25, 0.1)';
+        });
+
+        fileUploadArea.addEventListener('dragleave', function() {
+            fileUploadArea.style.borderColor = '#e0e0e0';
+            fileUploadArea.style.background = '#f8f9fa';
+        });
+
+        fileUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = '#e0e0e0';
+            fileUploadArea.style.background = '#f8f9fa';
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleImageUpload(file);
+            }
+        });
+
+        function handleImageUpload(file) {
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+            
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                imagePreview.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Form Submission
+        facilityForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!facilityForm.checkValidity()) {
+                facilityForm.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(facilityForm);
+            const facilityData = {
+                id: editingFacilityId || Date.now(),
+                name: formData.get('facilityName'),
+                type: formData.get('facilityType'),
+                club: formData.get('facilityClub'),
+                floor: formData.get('floorBuilding'),
+                capacity: formData.get('maxCapacity'),
+                size: formData.get('facilitySize'),
+                openingTime: formData.get('openingTime'),
+                closingTime: formData.get('closingTime'),
+                rate: formData.get('hourlyRate'),
+                status: formData.get('facilityStatus'),
+                surface: formData.get('surfaceType'),
+                description: formData.get('description'),
+                image: previewImg.src
+            };
+
+            console.log('Facility Data:', facilityData);
+
+            if (editingFacilityId) {
+                updateFacilityCard(facilityData);
+                showNotification('Facility updated successfully!', 'success');
+            } else {
+                createFacilityCard(facilityData);
+                showNotification('Facility created successfully!', 'success');
+            }
+
+            closeModal();
+        });
+
+        // Get facility type icon
+        function getFacilityIcon(type) {
+            const icons = {
+                'gym': 'fa-dumbbell',
+                'pool': 'fa-swimming-pool',
+                'court': 'fa-table-tennis',
+                'studio': 'fa-spa',
+                'track': 'fa-running',
+                'field': 'fa-futbol',
+                'spa': 'fa-hot-tub',
+                'other': 'fa-door-open'
+            };
+            return icons[type] || 'fa-door-open';
+        }
+
+        // Get club location
+        function getClubLocation(clubId) {
+            const clubs = {
+                '1': 'Al-Majd Sports Club, Riyadh',
+                '2': 'Royal Fitness Center, Jeddah',
+                '3': 'Champion Sports Complex, Dammam'
+            };
+            return clubs[clubId] || 'Unknown Location';
+        }
+
+        // Create new facility card
+        function createFacilityCard(data) {
+            const facilitiesGrid = document.querySelector('.facilities-grid');
+            const newCard = document.createElement('div');
+            newCard.className = 'facility-card';
+            newCard.dataset.facilityId = data.id;
+            
+            const statusClass = data.status === 'available' ? 'badge-available' : 
+                              data.status === 'occupied' ? 'badge-occupied' : 'badge-maintenance';
+            
+            newCard.innerHTML = `
+                <div class="facility-image">
+                    <img src="${data.image || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=300&fit=crop'}" alt="${data.name}">
+                    <div class="facility-badges">
+                        <span class="badge badge-type">${data.type}</span>
+                        <span class="badge ${statusClass}">${data.status}</span>
+                    </div>
+                    <div class="facility-icon">
+                        <i class="fas ${getFacilityIcon(data.type)}"></i>
+                    </div>
+                </div>
+                <div class="facility-content">
+                    <div class="facility-header">
+                        <div>
+                            <h3 class="facility-title">${data.name}</h3>
+                            <p class="facility-location">${getClubLocation(data.club)}</p>
+                        </div>
+                        <div class="facility-actions">
+                            <div class="action-icon edit" onclick="editFacility('${data.id}')"><i class="fas fa-edit"></i></div>
+                            <div class="action-icon delete" onclick="deleteFacility('${data.id}')"><i class="fas fa-trash-alt"></i></div>
+                        </div>
+                    </div>
+                    <div class="facility-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Capacity</div>
+                            <div class="meta-value">${data.capacity}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Size</div>
+                            <div class="meta-value">${data.size || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="facility-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">${Math.floor(Math.random() * 15) + 1}</div>
+                            <div class="stat-label">Activities</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${Math.floor(Math.random() * 80) + 10}</div>
+                            <div class="stat-label">Bookings</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${Math.floor(Math.random() * 40) + 60}%</div>
+                            <div class="stat-label">Usage</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            facilitiesGrid.insertBefore(newCard, facilitiesGrid.firstChild);
+            newCard.style.animation = 'cardSlideIn 0.5s ease';
+        }
+
+        // Update existing facility card
+        function updateFacilityCard(data) {
+            const card = document.querySelector(`[data-facility-id="${data.id}"]`);
+            if (!card) return;
+            
+            const img = card.querySelector('.facility-image img');
+            const badges = card.querySelector('.facility-badges');
+            const icon = card.querySelector('.facility-icon i');
+            const title = card.querySelector('.facility-title');
+            const location = card.querySelector('.facility-location');
+            const capacity = card.querySelectorAll('.meta-value')[0];
+            const size = card.querySelectorAll('.meta-value')[1];
+            
+            img.src = data.image || img.src;
+            title.textContent = data.name;
+            location.textContent = getClubLocation(data.club);
+            capacity.textContent = data.capacity;
+            size.textContent = data.size || 'N/A';
+            icon.className = `fas ${getFacilityIcon(data.type)}`;
+            
+            const statusClass = data.status === 'available' ? 'badge-available' : 
+                              data.status === 'occupied' ? 'badge-occupied' : 'badge-maintenance';
+            
+            badges.innerHTML = `
+                <span class="badge badge-type">${data.type}</span>
+                <span class="badge ${statusClass}">${data.status}</span>
+            `;
+        }
+
+        // Edit facility
+        function editFacility(facilityId) {
+            const card = document.querySelector(`[data-facility-id="${facilityId}"]`);
+            if (!card) return;
+            
+            const facilityData = {
+                id: facilityId,
+                name: card.querySelector('.facility-title').textContent,
+                image: card.querySelector('.facility-image img').src,
+                type: card.querySelector('.badge-type').textContent.toLowerCase(),
+                status: card.querySelectorAll('.badge')[1].textContent.toLowerCase(),
+                capacity: card.querySelectorAll('.meta-value')[0].textContent,
+                size: card.querySelectorAll('.meta-value')[1].textContent,
+                club: '1',
+                openingTime: '06:00',
+                closingTime: '22:00'
+            };
+            
+            openModal('edit', facilityData);
+        }
+
+        // Delete facility
+        function deleteFacility(facilityId) {
+            if (confirm('Are you sure you want to delete this facility?')) {
+                const card = document.querySelector(`[data-facility-id="${facilityId}"]`);
+                if (card) {
+                    card.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => {
+                        card.remove();
+                        showNotification('Facility deleted successfully!', 'success');
+                    }, 300);
+                }
+            }
+        }
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const facilityCards = document.querySelectorAll('.facility-card');
+            
+            facilityCards.forEach(card => {
+                const title = card.querySelector('.facility-title').textContent.toLowerCase();
+                const location = card.querySelector('.facility-location').textContent.toLowerCase();
+                const type = card.querySelector('.badge-type').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || location.includes(searchTerm) || type.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Add new facility button
+        document.querySelector('.add-btn').addEventListener('click', function() {
+            openModal('add');
+        });
+
+        // Notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                background: ${type === 'success' ? '#28a745' : '#dc3545'};
+                color: white;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 10000;
+                animation: slideInRight 0.3s ease;
+                font-size: 14px;
+                font-weight: 500;
+                max-width: 300px;
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Add facility ID to existing cards
+        document.querySelectorAll('.facility-card').forEach((card, index) => {
+            card.dataset.facilityId = `facility-${index + 1}`;
+            
+            const editBtn = card.querySelector('.action-icon.edit');
+            const deleteBtn = card.querySelector('.action-icon.delete');
+            
+            editBtn.onclick = function(e) {
+                e.stopPropagation();
+                editFacility(card.dataset.facilityId);
+            };
+            
+            deleteBtn.onclick = function(e) {
+                e.stopPropagation();
+                deleteFacility(card.dataset.facilityId);
+            };
+        });
+
+        window.editFacility = editFacility;
+        window.deleteFacility = deleteFacility;
+    </script>
+</body>
+</html>
